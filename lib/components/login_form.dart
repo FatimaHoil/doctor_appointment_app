@@ -1,9 +1,17 @@
+import 'dart:convert';
+
 import 'package:doctor_appointment_app/components/button.dart';
-import 'package:doctor_appointment_app/utils/config.dart';
+import 'package:doctor_appointment_app/main.dart';
+import 'package:doctor_appointment_app/models/auth_model.dart';
+import 'package:doctor_appointment_app/provider/dio_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../utils/config.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({super.key});
+  const LoginForm({Key? key}) : super(key: key);
 
   @override
   State<LoginForm> createState() => _LoginFormState();
@@ -43,7 +51,7 @@ class _LoginFormState extends State<LoginForm> {
                 hintText: 'Password',
                 labelText: 'Password',
                 alignLabelWithHint: true,
-                prefixIcon: const Icon(Icons.lock_clock_outlined),
+                prefixIcon: const Icon(Icons.lock_outline),
                 prefixIconColor: Config.PrimaryColor,
                 suffixIcon: IconButton(
                     onPressed: () {
@@ -62,12 +70,54 @@ class _LoginFormState extends State<LoginForm> {
                           ))),
           ),
           Config.spaceSmall,
-          Button(
-              width: double.infinity,
-              title: 'Sign In',
-              onPressed: () {},
-              disable: false,
-              )
+          Consumer<AuthModel>(
+            builder: (context, auth, child) {
+              return Button(
+                width: double.infinity,
+                title: 'Sign In',
+                onPressed: () async {
+                  //login here
+                  final token = await DioProvider()
+                      .getToken(_emailController.text, _passController.text);
+
+                  if (token) {
+                    //auth.loginSuccess(); //update login status
+                    //rediret to main page
+
+                    //grab user data here
+                    final SharedPreferences prefs =
+                        await SharedPreferences.getInstance();
+                    final tokenValue = prefs.getString('token') ?? '';
+
+                    if (tokenValue.isNotEmpty && tokenValue != '') {
+                      //get user data
+                      final response = await DioProvider().getUser(tokenValue);
+                      if (response != null) {
+                        setState(() {
+                          //json decode
+                          Map<String, dynamic> appointment = {};
+                          final user = json.decode(response);
+
+                          //check if any appointment today
+                          for (var doctorData in user['doctor']) {
+                            //if there is appointment return for today
+
+                            if (doctorData['appointments'] != null) {
+                              appointment = doctorData;
+                            }
+                          }
+
+                          auth.loginSuccess(user, appointment);
+                          MyApp.navigatorKey.currentState!.pushNamed('main');
+                        });
+                      }
+                    }
+                  }
+                },
+                disable: false,
+              );
+            },
+          )
         ],
       ),
     );

@@ -22,10 +22,10 @@ class Button extends StatelessWidget {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Config.PrimaryColor,
-          foregroundColor:  Colors.white,
+          foregroundColor: Colors.white,
         ),
         onPressed: disable ? null : onPressed,
-        child:  Text(
+        child: Text(
           title,
           style: const TextStyle(
             fontSize: 18,

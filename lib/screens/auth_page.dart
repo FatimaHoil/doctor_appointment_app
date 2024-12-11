@@ -1,4 +1,5 @@
 import 'package:doctor_appointment_app/components/login_form.dart';
+import 'package:doctor_appointment_app/components/social_button.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:doctor_appointment_app/utils/text.dart';
 import 'package:flutter/material.dart';
@@ -65,9 +66,11 @@ class _AuthPageState extends State<AuthPage> {
             const Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
-                //let's build social
+                SocialButton(social: 'google'),
+                SocialButton(social: 'facebook'),
               ],
-            )
+            ),
+            Config.spaceSmall,
           ],
         ),
       ),

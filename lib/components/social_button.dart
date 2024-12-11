@@ -2,13 +2,18 @@ import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
 
 class SocialButton extends StatelessWidget {
-  const SocialButton({super.key, required this.social});
+  const SocialButton({Key? key, required this.social}) : super(key: key);
 
   final String social;
 
   @override
   Widget build(BuildContext context) {
-    return  OutlinedButton(
+    Config().init(context);
+    return OutlinedButton(
+      style: OutlinedButton.styleFrom(
+        padding: const EdgeInsets.symmetric(vertical: 15),
+        side: const BorderSide(width: 1, color: Colors.black),
+      ),
       onPressed: () {},
       child: SizedBox(
         width: Config.widthSize * 0.4,
@@ -16,7 +21,7 @@ class SocialButton extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Image.asset(
-              'asset/$social.png',
+              'assets/$social.png',
               width: 40,
               height: 40,
             ),
@@ -25,7 +30,7 @@ class SocialButton extends StatelessWidget {
               style: const TextStyle(
                 color: Colors.black,
               ),
-            )
+            ),
           ],
         ),
       ),
