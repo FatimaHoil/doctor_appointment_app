@@ -36,7 +36,7 @@ class _AppointmentCardState extends State<AppointmentCard> {
                 children: [
                   CircleAvatar(
                     backgroundImage: NetworkImage(
-                        "http://127.0.0.1:8000${widget.doctor['doctor_profile']}"), //insert doctor profile
+                        "http://192.168.0.108:8000${widget.doctor['doctor_profile']}"), //insert doctor profile
                   ),
                   const SizedBox(
                     width: 10,
@@ -126,10 +126,8 @@ class _AppointmentCardState extends State<AppointmentCard> {
                                         .storeReviews(
                                             response.comment,
                                             response.rating,
-                                            widget.doctor['appointments']
-                                                ['id'], //this is appointment id
-                                            widget.doctor[
-                                                'doc_id'], //this is doctor id
+                                            widget.doctor['appointments']['id'], //this is appointment id
+                                            widget.doctor['doc_id'], //this is doctor id
                                             token);
 
                                     //if successful, then refresh

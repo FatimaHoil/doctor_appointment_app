@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:doctor_appointment_app/components/button.dart';
 import 'package:doctor_appointment_app/main.dart';
 import 'package:doctor_appointment_app/models/auth_model.dart';
@@ -7,7 +6,6 @@ import 'package:doctor_appointment_app/provider/dio_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../utils/config.dart';
 
 class LoginForm extends StatefulWidget {
@@ -22,6 +20,7 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   bool obsecurePass = true;
+
   @override
   Widget build(BuildContext context) {
     return Form(
@@ -48,26 +47,28 @@ class _LoginFormState extends State<LoginForm> {
             cursorColor: Config.PrimaryColor,
             obscureText: obsecurePass,
             decoration: InputDecoration(
-                hintText: 'Password',
-                labelText: 'Password',
-                alignLabelWithHint: true,
-                prefixIcon: const Icon(Icons.lock_outline),
-                prefixIconColor: Config.PrimaryColor,
-                suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        obsecurePass = !obsecurePass;
-                      });
-                    },
-                    icon: obsecurePass
-                        ? const Icon(
-                            Icons.visibility_off_outlined,
-                            color: Colors.black38,
-                          )
-                        : const Icon(
-                            Icons.visibility_outlined,
-                            color: Config.PrimaryColor,
-                          ))),
+              hintText: 'Password',
+              labelText: 'Password',
+              alignLabelWithHint: true,
+              prefixIcon: const Icon(Icons.lock_outline),
+              prefixIconColor: Config.PrimaryColor,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    obsecurePass = !obsecurePass;
+                  });
+                },
+                icon: obsecurePass
+                    ? const Icon(
+                        Icons.visibility_off_outlined,
+                        color: Colors.black38,
+                      )
+                    : const Icon(
+                        Icons.visibility_outlined,
+                        color: Config.PrimaryColor,
+                      ),
+              ),
+            ),
           ),
           Config.spaceSmall,
           Consumer<AuthModel>(
@@ -76,42 +77,47 @@ class _LoginFormState extends State<LoginForm> {
                 width: double.infinity,
                 title: 'Sign In',
                 onPressed: () async {
-                  //login here
-                  final token = await DioProvider()
-                      .getToken(_emailController.text, _passController.text);
+                  try {
+                    // Obtener el token
+                    final token = await DioProvider().getToken(
+                        _emailController.text, _passController.text);
+                    print('Token: $token'); // Depuración
 
-                  if (token) {
-                    //auth.loginSuccess(); //update login status
-                    //rediret to main page
+                    // Verificar y guardar el token
+                    if (token != null && !token.toString().startsWith('DioError')) {
+                      final SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      await prefs.setString('token', token); // Guardar el token
+                      final tokenValue = prefs.getString('token');
+                      print('Token Value from SharedPreferences: $tokenValue'); // Depuración
 
-                    //grab user data here
-                    final SharedPreferences prefs =
-                        await SharedPreferences.getInstance();
-                    final tokenValue = prefs.getString('token') ?? '';
+                      // Obtener datos del usuario
+                      if (tokenValue != null && tokenValue.isNotEmpty) {
+                        final response = await DioProvider().getUser(tokenValue);
+                        print('User Response: $response'); // Depuración
 
-                    if (tokenValue.isNotEmpty && tokenValue != '') {
-                      //get user data
-                      final response = await DioProvider().getUser(tokenValue);
-                      if (response != null) {
-                        setState(() {
-                          //json decode
-                          Map<String, dynamic> appointment = {};
-                          final user = json.decode(response);
+                        if (response != null && !response.toString().startsWith('DioError')) {
+                          setState(() {
+                            Map<String, dynamic> appointment = {};
+                            final user = json.decode(response);
 
-                          //check if any appointment today
-                          for (var doctorData in user['doctor']) {
-                            //if there is appointment return for today
-
-                            if (doctorData['appointments'] != null) {
-                              appointment = doctorData;
+                            for (var doctorData in user['doctor']) {
+                              if (doctorData['appointments'] != null) {
+                                appointment = doctorData;
+                              }
                             }
-                          }
 
-                          auth.loginSuccess(user, appointment);
-                          MyApp.navigatorKey.currentState!.pushNamed('main');
-                        });
+                            auth.loginSuccess(user, appointment);
+                            MyApp.navigatorKey.currentState!.pushNamed('main');
+                          });
+                        }
                       }
+                    } else {
+                      print('Token is null or an error occurred');
                     }
+                  } catch (e) {
+                    print('Error: $e');
+                    // Aquí puedes mostrar un mensaje de error al usuario
                   }
                 },
                 disable: false,
@@ -123,3 +129,5 @@ class _LoginFormState extends State<LoginForm> {
     );
   }
 }
+
+

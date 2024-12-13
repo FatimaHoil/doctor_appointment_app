@@ -1,5 +1,6 @@
-import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
+
+import '../utils/config.dart';
 
 class Button extends StatelessWidget {
   const Button(
@@ -12,7 +13,7 @@ class Button extends StatelessWidget {
 
   final double width;
   final String title;
-  final bool disable; //this is use to disable button
+  final bool disable; //this is used to disable button
   final Function() onPressed;
 
   @override
@@ -28,7 +29,7 @@ class Button extends StatelessWidget {
         child: Text(
           title,
           style: const TextStyle(
-            fontSize: 18,
+            fontSize: 11,
             fontWeight: FontWeight.bold,
           ),
         ),

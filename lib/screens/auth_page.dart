@@ -1,25 +1,29 @@
 import 'package:doctor_appointment_app/components/login_form.dart';
+import 'package:doctor_appointment_app/components/sing-up_form.dart';
 import 'package:doctor_appointment_app/components/social_button.dart';
-import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:doctor_appointment_app/utils/text.dart';
 import 'package:flutter/material.dart';
 
+import '../utils/config.dart';
+
 class AuthPage extends StatefulWidget {
-  const AuthPage({super.key});
+  const AuthPage({Key? key}) : super(key: key);
 
   @override
   State<AuthPage> createState() => _AuthPageState();
 }
 
 class _AuthPageState extends State<AuthPage> {
+  bool isSignIn = true;
   @override
   Widget build(BuildContext context) {
     Config().init(context);
+    //build login text field
     return Scaffold(
         body: Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 15,
+        horizontal: 10,
+        vertical: 10,
       ),
       child: SafeArea(
         child: Column(
@@ -28,49 +32,89 @@ class _AuthPageState extends State<AuthPage> {
           children: <Widget>[
             Text(
               AppText.enText['welcome_text']!,
-              style: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Config.spaceSmall,
             Text(
-              AppText.enText['singIn_Text']!,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            Config.spaceSmall,
-            const LoginForm(),
-            Config.spaceSmall,
-            Center(
-              child: TextButton(
-                onPressed: () {},
-                child: Text(
-                  AppText.enText['forgot-password']!,
-                  style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black),
-                ),
+              isSignIn
+                  ? AppText.enText['signIn_text']!
+                  : AppText.enText['register_text']!,
+              style: const TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            //Add social button sign in
+            Config.spaceSmall,
+            isSignIn ? LoginForm() : SignUpForm(),
+            Config.spaceSmall,
+            isSignIn
+                ? Center(
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text(
+                        AppText.enText['forgot-password']!,
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
             const Spacer(),
             Center(
               child: Text(
                 AppText.enText['social-login']!,
                 style: TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.normal,
-                    color:  Colors.grey.shade500,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  color: Colors.grey.shade500,
                 ),
               ),
             ),
             Config.spaceSmall,
-            const Row(
+            Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
+              children: const <Widget>[
                 SocialButton(social: 'google'),
                 SocialButton(social: 'facebook'),
               ],
             ),
             Config.spaceSmall,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Text(
+                  isSignIn
+                      ? AppText.enText['signUp_text']!
+                      : AppText.enText['registered_text']!,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.normal,
+                    color: Colors.grey.shade500,
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      isSignIn = !isSignIn;
+                    });
+                  },
+                  child: Text(
+                    isSignIn ? 'Sign Up' : 'Sign In',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
+                  ),
+                )
+              ],
+            )
           ],
         ),
       ),

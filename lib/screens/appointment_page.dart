@@ -1,9 +1,8 @@
-import 'dart:convert';
-
 import 'package:doctor_appointment_app/provider/dio_provider.dart';
 import 'package:doctor_appointment_app/utils/config.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class AppointmentPage extends StatefulWidget {
   const AppointmentPage({Key? key}) : super(key: key);
@@ -159,7 +158,7 @@ class _AppointmentPageState extends State<AppointmentPage> {
                             children: [
                               CircleAvatar(
                                 backgroundImage: NetworkImage(
-                                    "http://127.0.0.1:8000${schedule['doctor_profile']}"),
+                                    "http://192.168.0.108:8000${schedule['doctor_profile']}"),
                               ),
                               const SizedBox(
                                 width: 10,
