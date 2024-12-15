@@ -8,52 +8,54 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const MyApp()); // Punto de entrada de la aplicación Flutter
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  //this is for push navigator
+  // Clave global para manejar la navegación push
   static final navigatorKey = GlobalKey<NavigatorState>();
 
   @override
   Widget build(BuildContext context) {
-    //define ThemeData here
+    // Configuración del tema y proveedor principal de la aplicación
     return ChangeNotifierProvider<AuthModel>(
-      create: (context) => AuthModel(),
+      create: (context) => AuthModel(), // Modelo de autenticación
       child: MaterialApp(
-        navigatorKey: navigatorKey,
-        title: 'Flutter Doctor App',
-        debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey, // Clave para navegación global
+        title: 'Flutter Doctor App', // Título de la aplicación
+        debugShowCheckedModeBanner: false, // Oculta el banner de depuración
         theme: ThemeData(
-          //pre-define input decoration
+          // Tema de diseño predefinido para la aplicación
           inputDecorationTheme: const InputDecorationTheme(
-            focusColor: Config.PrimaryColor,
-            border: Config.outlinedBorder,
-            focusedBorder: Config.focusBorder,
-            errorBorder: Config.errorBorder,
-            enabledBorder: Config.outlinedBorder,
-            floatingLabelStyle: TextStyle(color: Config.PrimaryColor),
-            prefixIconColor: Colors.black38,
+            // Configuración de campos de entrada
+            focusColor: Config.primaryColor, // Color del foco
+            border: Config.outlinedBorder, // Borde predeterminado
+            focusedBorder: Config.focusBorder, // Borde al enfocar
+            errorBorder: Config.errorBorder, // Borde para errores
+            enabledBorder: Config.outlinedBorder, // Borde habilitado
+            floatingLabelStyle: TextStyle(color: Config.primaryColor), // Estilo de etiquetas flotantes
+            prefixIconColor: Colors.black38, // Color de los íconos de prefijo
           ),
-          scaffoldBackgroundColor: Colors.white,
+          scaffoldBackgroundColor: Colors.white, // Color de fondo del scaffold
           bottomNavigationBarTheme: BottomNavigationBarThemeData(
-            backgroundColor: Config.PrimaryColor,
-            selectedItemColor: Colors.white,
-            showSelectedLabels: true,
-            showUnselectedLabels: false,
-            unselectedItemColor: Colors.grey.shade700,
-            elevation: 10,
-            type: BottomNavigationBarType.fixed,
+            // Tema para la barra de navegación inferior
+            backgroundColor: Config.primaryColor, // Color de fondo
+            selectedItemColor: Colors.white, // Color de ítem seleccionado
+            showSelectedLabels: true, // Mostrar etiquetas seleccionadas
+            showUnselectedLabels: false, // Ocultar etiquetas no seleccionadas
+            unselectedItemColor: Colors.grey.shade700, // Color de ítem no seleccionado
+            elevation: 10, // Elevación de la barra
+            type: BottomNavigationBarType.fixed, // Tipo fijo de barra
           ),
         ),
-        initialRoute: '/',
+        initialRoute: '/', // Ruta inicial de la aplicación
         routes: {
-          '/': (context) => const AuthPage(),
-          'main': (context) => const MainLayout(),
-          'booking_page': (context) => BookingPage(),
-          'success_booking': (context) => const AppointmentBooked(),
+          '/': (context) => const AuthPage(), // Página de autenticación
+          'main': (context) => const MainLayout(), // Página principal
+          'booking_page': (context) => const BookingPage(), // Página de reserva
+          'success_booking': (context) => const AppointmentBooked(), // Página de éxito en la reserva
         },
       ),
     );

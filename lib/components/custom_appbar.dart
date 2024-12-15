@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
-  CustomAppBar({Key? key, this.appTitle, this.route, this.icon, this.actions})
+  const CustomAppBar(
+      {Key? key, this.appTitle, this.route, this.icon, this.actions})
       : super(key: key);
   @override
   Size get preferredSize => const Size.fromHeight(60);
@@ -37,7 +38,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
               margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                color: Config.PrimaryColor,
+                color: Config.primaryColor,
               ),
               child: IconButton(
                 onPressed: () {
@@ -60,3 +61,4 @@ class _CustomAppBarState extends State<CustomAppBar> {
     );
   }
 }
+

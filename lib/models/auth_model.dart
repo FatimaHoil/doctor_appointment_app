@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 
 class AuthModel extends ChangeNotifier {
@@ -36,11 +35,12 @@ class AuthModel extends ChangeNotifier {
   List<Map<String, dynamic>> get getFavDoc {
     favDoc.clear(); //clear all previous record before get latest list
 
-    //list out doctor list according to favorite list
-    for (var num in _fav) {
-      for (var doc in user['doctor']) {
-        if (num == doc['doc_id']) {
-          favDoc.add(doc);
+    if (user['doctor'] != null) {
+      for (var num in _fav) {
+        for (var doc in user['doctor']) {
+          if (num == doc['doc_id']) {
+            favDoc.add(doc);
+          }
         }
       }
     }
@@ -55,7 +55,7 @@ class AuthModel extends ChangeNotifier {
     //update all these data when login
     user = userData;
     appointment = appointmentInfo;
-    if (user['details']['fav'] != null) {
+    if (user['details']?['fav'] != null) {
       _fav = json.decode(user['details']['fav']);
     }
 

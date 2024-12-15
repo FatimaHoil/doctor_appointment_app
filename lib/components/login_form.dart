@@ -20,6 +20,7 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController();
   final _passController = TextEditingController();
   bool obsecurePass = true;
+  String errorMessage = ''; // Variable para manejar el mensaje de error
 
   @override
   Widget build(BuildContext context) {
@@ -31,46 +32,52 @@ class _LoginFormState extends State<LoginForm> {
           TextFormField(
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
-            cursorColor: Config.PrimaryColor,
+            cursorColor: Config.primaryColor,
             decoration: const InputDecoration(
               hintText: 'Email Address',
               labelText: 'Email',
               alignLabelWithHint: true,
               prefixIcon: Icon(Icons.email_outlined),
-              prefixIconColor: Config.PrimaryColor,
+              prefixIconColor: Config.primaryColor,
             ),
           ),
           Config.spaceSmall,
           TextFormField(
             controller: _passController,
             keyboardType: TextInputType.visiblePassword,
-            cursorColor: Config.PrimaryColor,
+            cursorColor: Config.primaryColor,
             obscureText: obsecurePass,
             decoration: InputDecoration(
-              hintText: 'Password',
-              labelText: 'Password',
-              alignLabelWithHint: true,
-              prefixIcon: const Icon(Icons.lock_outline),
-              prefixIconColor: Config.PrimaryColor,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  setState(() {
-                    obsecurePass = !obsecurePass;
-                  });
-                },
-                icon: obsecurePass
-                    ? const Icon(
-                        Icons.visibility_off_outlined,
-                        color: Colors.black38,
-                      )
-                    : const Icon(
-                        Icons.visibility_outlined,
-                        color: Config.PrimaryColor,
-                      ),
-              ),
-            ),
+                hintText: 'Password',
+                labelText: 'Password',
+                alignLabelWithHint: true,
+                prefixIcon: const Icon(Icons.lock_outline),
+                prefixIconColor: Config.primaryColor,
+                suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        obsecurePass = !obsecurePass;
+                      });
+                    },
+                    icon: obsecurePass
+                        ? const Icon(
+                            Icons.visibility_off_outlined,
+                            color: Colors.black38,
+                          )
+                        : const Icon(
+                            Icons.visibility_outlined,
+                            color: Config.primaryColor,
+                          ))),
           ),
           Config.spaceSmall,
+          if (errorMessage.isNotEmpty) ...[
+            // Mostrar el mensaje de error
+            Text(
+              errorMessage,
+              style: const TextStyle(color: Colors.red, fontSize: 16),
+            ),
+            Config.spaceSmall,
+          ],
           Consumer<AuthModel>(
             builder: (context, auth, child) {
               return Button(
@@ -78,29 +85,26 @@ class _LoginFormState extends State<LoginForm> {
                 title: 'Sign In',
                 onPressed: () async {
                   try {
-                    // Obtener el token
-                    final token = await DioProvider().getToken(
-                        _emailController.text, _passController.text);
-                    print('Token: $token'); // Depuración
+                    // Intentar obtener el token
+                    final token = await DioProvider()
+                        .getToken(_emailController.text, _passController.text);
 
-                    // Verificar y guardar el token
-                    if (token != null && !token.toString().startsWith('DioError')) {
+                    if (token) {
+                      // Si el token es exitoso, obtener los datos del usuario
                       final SharedPreferences prefs =
                           await SharedPreferences.getInstance();
-                      await prefs.setString('token', token); // Guardar el token
-                      final tokenValue = prefs.getString('token');
-                      print('Token Value from SharedPreferences: $tokenValue'); // Depuración
+                      final tokenValue = prefs.getString('token') ?? '';
 
-                      // Obtener datos del usuario
-                      if (tokenValue != null && tokenValue.isNotEmpty) {
-                        final response = await DioProvider().getUser(tokenValue);
-                        print('User Response: $response'); // Depuración
-
-                        if (response != null && !response.toString().startsWith('DioError')) {
+                      if (tokenValue.isNotEmpty) {
+                        // Obtener los datos del usuario
+                        final response =
+                            await DioProvider().getUser(tokenValue);
+                        if (response != null) {
                           setState(() {
                             Map<String, dynamic> appointment = {};
                             final user = json.decode(response);
 
+                            // Verificar si hay una cita para hoy
                             for (var doctorData in user['doctor']) {
                               if (doctorData['appointments'] != null) {
                                 appointment = doctorData;
@@ -112,22 +116,21 @@ class _LoginFormState extends State<LoginForm> {
                           });
                         }
                       }
-                    } else {
-                      print('Token is null or an error occurred');
                     }
                   } catch (e) {
-                    print('Error: $e');
-                    // Aquí puedes mostrar un mensaje de error al usuario
+                    // Si ocurre un error (credenciales incorrectas)
+                    setState(() {
+                      errorMessage =
+                          'Whoops! Something went wrong. These credentials do not match our records.';
+                    });
                   }
                 },
                 disable: false,
               );
             },
-          )
+          ),
         ],
       ),
     );
   }
 }
-
-

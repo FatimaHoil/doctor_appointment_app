@@ -11,21 +11,21 @@ import '../components//custom_appbar.dart';
 class DoctorDetails extends StatefulWidget {
   const DoctorDetails({Key? key, required this.doctor, required this.isFav})
       : super(key: key);
-  final Map<String, dynamic> doctor;
-  final bool isFav;
+  final Map<String, dynamic> doctor; // Mapa que contiene información del doctor.
+  final bool isFav; // Indica si el doctor está marcado como favorito.
 
   @override
   State<DoctorDetails> createState() => _DoctorDetailsState();
 }
 
 class _DoctorDetailsState extends State<DoctorDetails> {
-  Map<String, dynamic> doctor = {};
-  bool isFav = false;
+  Map<String, dynamic> doctor = {}; // Almacena los datos del doctor.
+  bool isFav = false; // Estado del doctor como favorito.
 
   @override
   void initState() {
-    doctor = widget.doctor;
-    isFav = widget.isFav;
+    doctor = widget.doctor; // Inicializa el mapa del doctor.
+    isFav = widget.isFav; // Inicializa el estado de favorito.
     super.initState();
   }
 
@@ -36,23 +36,23 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         appTitle: 'Doctor Details',
         icon: const FaIcon(Icons.arrow_back_ios),
         actions: [
-          //Favarite Button
+          // Botón de favorito.
           IconButton(
-            //press this button to add/remove favorite doctor
+            // Al presionar este botón, se agrega o elimina el doctor de favoritos.
             onPressed: () async {
-              //get latest favorite list from auth model
+              // Obtener la lista actual de favoritos del modelo de autenticación.
               final list =
                   Provider.of<AuthModel>(context, listen: false).getFav;
 
-              //if doc id is already exist, mean remove the doc id
+              // Si el ID del doctor ya está en la lista, lo elimina.
               if (list.contains(doctor['doc_id'])) {
                 list.removeWhere((id) => id == doctor['doc_id']);
               } else {
-                //else, add new doctor to favorite list
+                // De lo contrario, agrega el doctor a la lista de favoritos.
                 list.add(doctor['doc_id']);
               }
 
-              //update the list into auth model and notify all widgets
+              // Actualiza la lista de favoritos en el modelo de autenticación.
               Provider.of<AuthModel>(context, listen: false).setFavList(list);
 
               final SharedPreferences prefs =
@@ -60,10 +60,9 @@ class _DoctorDetailsState extends State<DoctorDetails> {
               final token = prefs.getString('token') ?? '';
 
               if (token.isNotEmpty && token != '') {
-                //update the favorite list into database
+                // Actualiza la lista de favoritos en la base de datos.
                 final response = await DioProvider().storeFavDoc(token, list);
-                //if insert successfully, then change the favorite status
-
+                // Si se actualiza correctamente, cambia el estado de favorito.
                 if (response == 200) {
                   setState(() {
                     isFav = !isFav;
@@ -73,7 +72,7 @@ class _DoctorDetailsState extends State<DoctorDetails> {
             },
             icon: FaIcon(
               isFav ? Icons.favorite_rounded : Icons.favorite_outline,
-              color: Colors.red,
+              color: Colors.red, // Cambia el color del ícono según el estado.
             ),
           )
         ],
@@ -82,17 +81,17 @@ class _DoctorDetailsState extends State<DoctorDetails> {
         child: Column(
           children: <Widget>[
             AboutDoctor(
-              doctor: doctor,
+              doctor: doctor, // Información del doctor.
             ),
             DetailBody(
-              doctor: doctor,
+              doctor: doctor, // Detalles adicionales del doctor.
             ),
             const Spacer(),
             Padding(
               padding: const EdgeInsets.all(20),
               child: Button(
                 width: double.infinity,
-                title: 'Book Appointment',
+                title: 'Book Appointment', // Botón para reservar una cita.
                 onPressed: () {
                   Navigator.of(context).pushNamed('booking_page',
                       arguments: {"doctor_id": doctor['doc_id']});
@@ -110,25 +109,23 @@ class _DoctorDetailsState extends State<DoctorDetails> {
 class AboutDoctor extends StatelessWidget {
   const AboutDoctor({Key? key, required this.doctor}) : super(key: key);
 
-  final Map<dynamic, dynamic> doctor;
+  final Map<dynamic, dynamic> doctor; // Información del doctor.
 
   @override
   Widget build(BuildContext context) {
-    Config().init(context);
+    Config().init(context); // Configuración inicial.
     return Container(
       width: double.infinity,
       child: Column(
         children: <Widget>[
           CircleAvatar(
             radius: 65.0,
-            backgroundImage: NetworkImage(
-              "http://127.0.0.1:8000${doctor['doctor_profile']}",
-            ),
+            backgroundImage: NetworkImage("${doctor['doctor_profile']}"),
             backgroundColor: Colors.white,
           ),
           Config.spaceMedium,
           Text(
-            "Dr ${doctor['doctor_name']}",
+            "Dr ${doctor['doctor_name']}", // Nombre del doctor.
             style: const TextStyle(
               color: Colors.black,
               fontSize: 24.0,
@@ -140,6 +137,7 @@ class AboutDoctor extends StatelessWidget {
             width: Config.widthSize * 0.75,
             child: const Text(
               'MBBS (International Medical University, Malaysia), MRCP (Royal College of Physicians, United Kingdom)',
+              // Información académica del doctor.
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 15,
@@ -152,7 +150,7 @@ class AboutDoctor extends StatelessWidget {
           SizedBox(
             width: Config.widthSize * 0.75,
             child: const Text(
-              'Sarawak General Hospital',
+              'Sarawak General Hospital', // Hospital asociado.
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -170,7 +168,7 @@ class AboutDoctor extends StatelessWidget {
 
 class DetailBody extends StatelessWidget {
   const DetailBody({Key? key, required this.doctor}) : super(key: key);
-  final Map<dynamic, dynamic> doctor;
+  final Map<dynamic, dynamic> doctor; // Información adicional del doctor.
 
   @override
   Widget build(BuildContext context) {
@@ -182,17 +180,18 @@ class DetailBody extends StatelessWidget {
         children: <Widget>[
           Config.spaceSmall,
           DoctorInfo(
-            patients: doctor['patients'],
-            exp: doctor['experience'],
+            patients: doctor['patients'], // Número de pacientes atendidos.
+            exp: doctor['experience'], // Años de experiencia.
           ),
           Config.spaceMedium,
           const Text(
-            'About Doctor',
+            'About Doctor', // Título de la sección.
             style: TextStyle(fontWeight: FontWeight.w600, fontSize: 18),
           ),
           Config.spaceSmall,
           Text(
             'Dr. ${doctor['doctor_name']} is an experience ${doctor['category']} Specialist at Sarawak, graduated since 2008, and completed his/her training at Sungai Buloh General Hospital.',
+            // Descripción del doctor.
             style: const TextStyle(
               fontWeight: FontWeight.w500,
               height: 1.5,
@@ -210,29 +209,29 @@ class DoctorInfo extends StatelessWidget {
   const DoctorInfo({Key? key, required this.patients, required this.exp})
       : super(key: key);
 
-  final int patients;
-  final int exp;
+  final int patients; // Cantidad de pacientes atendidos.
+  final int exp; // Años de experiencia.
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: <Widget>[
         InfoCard(
-          label: 'Patients',
+          label: 'Patients', // Etiqueta para pacientes.
           value: '$patients',
         ),
         const SizedBox(
           width: 15,
         ),
         InfoCard(
-          label: 'Experiences',
+          label: 'Experiences', // Etiqueta para experiencia.
           value: '$exp years',
         ),
         const SizedBox(
           width: 15,
         ),
         const InfoCard(
-          label: 'Rating',
+          label: 'Rating', // Etiqueta para calificación.
           value: '4.6',
         ),
       ],
@@ -244,16 +243,16 @@ class InfoCard extends StatelessWidget {
   const InfoCard({Key? key, required this.label, required this.value})
       : super(key: key);
 
-  final String label;
-  final String value;
+  final String label; // Etiqueta de la tarjeta.
+  final String value; // Valor de la tarjeta.
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(15),
-          color: Config.PrimaryColor,
+          borderRadius: BorderRadius.circular(15), // Esquinas redondeadas.
+          color: Config.primaryColor, // Color principal de la tarjeta.
         ),
         padding: const EdgeInsets.symmetric(
           vertical: 15,
@@ -262,7 +261,7 @@ class InfoCard extends StatelessWidget {
         child: Column(
           children: <Widget>[
             Text(
-              label,
+              label, // Texto de la etiqueta.
               style: const TextStyle(
                 color: Colors.black,
                 fontSize: 12,
@@ -273,7 +272,7 @@ class InfoCard extends StatelessWidget {
               height: 10,
             ),
             Text(
-              value,
+              value, // Texto del valor.
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 15,
